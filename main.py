@@ -344,7 +344,7 @@ plt.savefig('eda_word_distribution.png', dpi=300, bbox_inches='tight')
 #4. TF-IDF VECTORIZATION
 print("\nPHẦN 4: TF-IDF VECTORIZATION")
 #4.1 Tạo TF-IDF vectors
-vietnamese_stopwords = ['của', 'và', 'có', 'trong', 'được', 'này', ...]
+vietnamese_stopwords = ['của', 'và', 'có', 'trong', 'được', 'này']
 tfidf_vectorizer = TfidfVectorizer(
     max_features=1000,
     min_df=2,
