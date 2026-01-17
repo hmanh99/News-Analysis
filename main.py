@@ -308,12 +308,7 @@ tfidf_vectorizer = TfidfVectorizer(
     max_df=0.8,
     ngram_range=(1, 2),
     stop_words=vietnamese_stopwords,
-    sublinear_tf = True,
-    use_idf= True,
-    smooth_idf= True,
-    strip_accents=None,
-    lowercase=True,
-    token_pattern=r'\b\w+\b'
+
 )
 
 tfidf_matrix = tfidf_vectorizer.fit_transform(df_clean['tokens'])
