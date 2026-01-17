@@ -1,10 +1,10 @@
-#1. raw_data.csv - Dữ liệu thô
-#2. processed_data.csv - Dữ liệu đã xử lý
-#3. news_with_topics.csv - Kết quả phân tích chủ đề
-#4. topics_summary.csv - Tóm tắt các chủ đề
-#5. eda_word_distribution.png - Biểu đồ phân tích mô tả
-#6. topic_analysis_results.png - Biểu đồ kết quả phân tích
-#7. topic_wordclouds.png - Word clouds các chủ đề
+# 1. raw_data.csv - Dữ liệu thô
+# 2. processed_data.csv - Dữ liệu đã xử lý
+# 3. news_with_topics.csv - Kết quả phân tích chủ đề
+# 4. topics_summary.csv - Tóm tắt các chủ đề
+# 5. eda_word_distribution.png - Biểu đồ phân tích mô tả
+# 6. topic_analysis_results.png - Biểu đồ kết quả phân tích
+# 7. topic_wordclouds.png - Word clouds các chủ đề
 
 
 import requests
@@ -26,7 +26,7 @@ from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.cluster import KMeans
 
 
-#1. THU THẬP DỮ LIỆU
+# 1. THU THẬP DỮ LIỆU
 
 
 class NewsCollector:
@@ -201,7 +201,6 @@ class NewsCollector:
         return pd.DataFrame(self.articles)
 
 
-
 print("PHẦN 1: THU THẬP DỮ LIỆUu")
 collector = NewsCollector()
 collector.collect_vnexpress(max_articles=300)
@@ -215,8 +214,7 @@ print(f"TỔNG SỐ BÀI VIẾT THU THẬP: {len(df)}")
 df.to_csv('raw_data.csv', index=False, encoding='utf-8-sig')
 print("\n Đã lưu dữ liệu thô vào: news_raw_data.csv")
 
-
-#2. TIỀN XỬ LÝ DỮ LIỆU
+# 2. TIỀN XỬ LÝ DỮ LIỆU
 
 print("PHẦN 2: TIỀN XỬ LÝ DỮ LIỆU")
 
@@ -230,6 +228,8 @@ print(f"Số bài sau khi loại bỏ trùng lặp: {len(df_clean)}")
 
 # 2.2 Hàm làm sạch văn bản
 print("\n2.2. Làm sạch văn bản")
+
+
 def clean_text(text, language='vi'):
     text = text.lower()
     text = re.sub(r"http\S+", "", text)
@@ -237,13 +237,14 @@ def clean_text(text, language='vi'):
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
 
+
 df_clean['clean_content'] = df_clean.apply(
     lambda row: clean_text(row['content'], row['language']), axis=1
 )
 
-
 # 2.3 Tách từ cho tiếng Việt
 print("\n2.3. Tách từ tiếng Việt")
+
 
 def tokenize_text(text, language):
     if language == 'vi':
@@ -251,24 +252,21 @@ def tokenize_text(text, language):
     else:
         return text
 
+
 df_clean['tokens'] = df_clean.apply(
     lambda row: tokenize_text(row['clean_content'], row['language']), axis=1
 )
 
-#2.4 Lưu dữ liệu đã xử lý
+# 2.4 Lưu dữ liệu đã xử lý
 df_clean.to_csv('processed_data.csv', index=False, encoding='utf-8-sig')
 
-
-
-
-#3. PHÂN TÍCH DỮ LIỆU MÔ TẢ
+# 3. PHÂN TÍCH DỮ LIỆU MÔ TẢ
 print("\nPHẦN 3: PHÂN TÍCH DỮ LIỆU MÔ TẢ")
-#3.1 Thống kê cơ bản
+# 3.1 Thống kê cơ bản
 print("\nThống kê theo nguồn tin:")
 print(df_clean['source'].value_counts())
 
-
-#3.2 Phân bố độ dài văn bản
+# 3.2 Phân bố độ dài văn bản
 df_clean['word_count'] = df_clean['tokens'].apply(lambda x: len(x.split()))
 
 plt.figure(figsize=(12, 5))
@@ -287,10 +285,9 @@ plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig('eda_word_distribution.png', dpi=300, bbox_inches='tight')
 
-
-#4. TF-IDF VECTORIZATION
+# 4. TF-IDF VECTORIZATION
 print("\nPHẦN 4: TF-IDF VECTORIZATION")
-#4.1 Tạo TF-IDF vectors
+# 4.1 Tạo TF-IDF vectors
 vietnamese_stopwords = [
     "của", "và", "có", "trong", "được", "này", "ấy", "nên", "vào",
     "là", "với", "cho", "từ", "theo", "như", "đã", "sẽ", "bị", "để",
@@ -307,7 +304,7 @@ vietnamese_stopwords = [
     "sáng", "chiều", "tối", "đêm", "thứ_hai", "thứ_ba",
     "hôm_qua", "ngày_mai", "trong_ngày", "năm_nay",
     "triệu", "tỷ", "nghìn", "trăm", "phần_trăm", "lần",
-    "người", "cái", "chiếc", "tờ", "bài", "tin"
+    "người", "cái", "chiếc", "tờ", "bài", "tin", "có_thể", "mỗi",
 ]
 tfidf_vectorizer = TfidfVectorizer(
     max_features=1000,
@@ -320,7 +317,7 @@ tfidf_vectorizer = TfidfVectorizer(
 
 tfidf_matrix = tfidf_vectorizer.fit_transform(df_clean['tokens'])
 
-#4.2 Top từ khóa
+# 4.2 Top từ khóa
 feature_names = tfidf_vectorizer.get_feature_names_out()
 tfidf_sum = np.asarray(tfidf_matrix.sum(axis=0)).flatten()
 top_indices = tfidf_sum.argsort()[-20:][::-2]
@@ -329,12 +326,10 @@ print("\nTop 20 từ khóa (TF-IDF):")
 for idx in top_indices:
     print(f"  - {feature_names[idx]}: {tfidf_sum[idx]:.2f}")
 
-
-#5. TOPIC MODELING VỚI LDA
+# 5. TOPIC MODELING VỚI LDA
 print("PHẦN 5: TOPIC MODELING VỚI LDA")
- 
 
-#5.1 Chuẩn bị dữ liệu cho LDA
+# 5.1 Chuẩn bị dữ liệu cho LDA
 count_vectorizer = CountVectorizer(
     max_features=1000,
     min_df=2,
@@ -345,9 +340,9 @@ count_vectorizer = CountVectorizer(
 
 count_matrix = count_vectorizer.fit_transform(df_clean['tokens'])
 
-#5.2 Huấn luyện mô hình LDA
+# 5.2 Huấn luyện mô hình LDA
 lda_model = LatentDirichletAllocation(
-    n_components= 5,
+    n_components=5,
     random_state=42,
     max_iter=20,
     learning_method='online',
@@ -357,8 +352,7 @@ lda_model = LatentDirichletAllocation(
 lda_output = lda_model.fit_transform(count_matrix)
 print("Huấn luyện mô hình LDA với 5 chủ đề")
 
-
-#5.3 Hiển thị các chủ đề
+# 5.3 Hiển thị các chủ đề
 print("CÁC CHỦ ĐỀ PHÁT HIỆN ĐƯỢC BẰNG MÔ HÌNH LDA: ")
 feature_names = count_vectorizer.get_feature_names_out()
 
@@ -375,54 +369,44 @@ def display_topics(model, feature_names, n_top_words=10):
 
     return topics
 
+
 topics = display_topics(lda_model, feature_names, n_top_words=10)
 
-#5.4 Gán chủ đề cho mỗi bài viết
+# 5.4 Gán chủ đề cho mỗi bài viết
 df_clean['dominant_topic'] = lda_output.argmax(axis=1)
 df_clean['topic_probability'] = lda_output.max(axis=1)
 
-
-
-#6. PHÂN CỤM VỚI K-MEANS
+# 6. PHÂN CỤM VỚI K-MEANS
 print("PHẦN 6: PHÂN CỤM VỚI K-MEANS")
 
 kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
 df_clean['kmeans_cluster'] = kmeans.fit_predict(tfidf_matrix)
 
-
-
-#7. TRỰC QUAN HÓA KẾT QUẢ THU THẬP ĐƯỢC
+# 7. TRỰC QUAN HÓA KẾT QUẢ THU THẬP ĐƯỢC
 print("PHẦN 7: TRỰC QUAN HÓA KẾT QUẢ")
 
 # 7.1 Phân bố theo chủ đề
 fig, axes = plt.subplots(2, 2, figsize=(15, 12))
 
-
-#Biểu đồ 1: Phân bố chủ đề LDA
+# Biểu đồ 1: Phân bố chủ đề LDA
 sns.countplot(data=df_clean, x='dominant_topic', ax=axes[0, 0], palette='viridis')
 axes[0, 0].set_title('Phân bố các chủ đề (LDA)', fontsize=14, fontweight='bold')
 axes[0, 0].set_xlabel('Chủ đề')
 axes[0, 0].set_ylabel('Số bài viết')
 
-
-
-#Biểu đồ 2: Phân bố cụm K-Means
+# Biểu đồ 2: Phân bố cụm K-Means
 sns.countplot(data=df_clean, x='kmeans_cluster', ax=axes[0, 1], palette='coolwarm')
 axes[0, 1].set_title('Phân bố các cụm (K-Means)', fontsize=13, fontweight='bold')
 axes[0, 1].set_xlabel('Cụm')
 axes[0, 1].set_ylabel('Số bài viết')
 
-
-
-#Biểu đồ 3: Độ tin cậy chủ đề
+# Biểu đồ 3: Độ tin cậy chủ đề
 sns.histplot(data=df_clean, x='topic_probability', bins=30, kde=True, ax=axes[1, 0])
 axes[1, 0].set_title('Phân bố độ tin cậy chủ đề', fontsize=13, fontweight='bold')
 axes[1, 0].set_xlabel('Xác suất')
 axes[1, 0].set_ylabel('Tần suất')
 
-
-
-#Biểu đồ 4: Chủ đề theo nguồn
+# Biểu đồ 4: Chủ đề theo nguồn
 pd.crosstab(df_clean['source'], df_clean['dominant_topic']).plot(
     kind='bar', stacked=True, ax=axes[1, 1], colormap='Set3'
 )
@@ -434,8 +418,7 @@ axes[1, 1].legend(title='Chủ đề', bbox_to_anchor=(1.05, 1))
 plt.tight_layout()
 plt.savefig('topic_analysis_results.png', dpi=300, bbox_inches='tight')
 
-
-#7.2 Word Cloud cho mỗi chủ đề thu thập được
+# 7.2 Word Cloud cho mỗi chủ đề thu thập được
 fig, axes = plt.subplots(2, 3, figsize=(18, 10))
 axes = axes.flatten()
 
@@ -455,13 +438,13 @@ bacis_vietnamese_stop_words = {
     "sáng", "chiều", "tối", "đêm", "thứ_hai", "thứ_ba",
     "hôm_qua", "ngày_mai", "trong_ngày", "năm_nay",
     "triệu", "tỷ", "nghìn", "trăm", "phần_trăm", "lần",
-    "người", "cái", "chiếc", "tờ", "bài", "tin"
+    "người", "cái", "chiếc", "tờ", "bài", "tin", "có_thể", "mỗi"
 }
-for topic_idx in range( 5):
+for topic_idx in range(5):
     topic_docs = df_clean[df_clean['dominant_topic'] == topic_idx]['tokens']
     topic_text = ' '.join(topic_docs)
 
-#7.2.1 tạo wordcloud
+    # 7.2.1 tạo wordcloud
     wordcloud = WordCloud(
         width=480,
         height=360,
@@ -482,15 +465,15 @@ axes[-1].axis('off')
 plt.tight_layout()
 plt.savefig('topic_wordclouds.png', dpi=360, bbox_inches='tight')
 
+# 8. LƯU KẾT QUẢ CUỐI CÙNG
 
-#8. LƯU KẾT QUẢ CUỐI CÙNG
-
-df_final = df_clean[['source', 'title', 'content', 'dominant_topic', 'topic_probability', 'kmeans_cluster', 'word_count']]
+df_final = df_clean[
+    ['source', 'title', 'content', 'dominant_topic', 'topic_probability', 'kmeans_cluster', 'word_count']]
 df_final.to_csv('news_with_topics.csv', index=False, encoding='utf-8-sig')
 
 topics_df = pd.DataFrame({
-    'Topic': [f'Topic {i + 1}' for i in range( 5)],
+    'Topic': [f'Topic {i + 1}' for i in range(5)],
     'Keywords': [', '.join(topic) for topic in topics],
-    'Article_Count': [len(df_clean[df_clean['dominant_topic'] == i]) for i in range( 5)]
+    'Article_Count': [len(df_clean[df_clean['dominant_topic'] == i]) for i in range(5)]
 })
 topics_df.to_csv('topics_summary.csv', index=False, encoding='utf-8-sig')
