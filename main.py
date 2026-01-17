@@ -300,7 +300,7 @@ vietnamese_stopwords = [
     "là", "với", "cho", "từ", "theo", "như", "đã", "sẽ", "bị", "để",
     "khi", "đang", "lại", "thì", "nhưng", "nếu", "mà", "chỉ", "đó",
     "đây", "tất_cả", "những", "các", "một", "hai", "ba", "nhiều",
-    "về", "ở", "tại"
+    "về", "ở", "tại", "mới", "đến", "đi", "sau", "ra", "hơn"
 ]
 tfidf_vectorizer = TfidfVectorizer(
     max_features=1000,
@@ -321,7 +321,7 @@ tfidf_matrix = tfidf_vectorizer.fit_transform(df_clean['tokens'])
 #4.2 Top từ khóa
 feature_names = tfidf_vectorizer.get_feature_names_out()
 tfidf_sum = np.asarray(tfidf_matrix.sum(axis=0)).flatten()
-top_indices = tfidf_sum.argsort()[-20:][::-1]
+top_indices = tfidf_sum.argsort()[-20:][::-2]
 
 print("\nTop 20 từ khóa (TF-IDF):")
 for idx in top_indices:
