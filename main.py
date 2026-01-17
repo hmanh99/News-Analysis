@@ -14,10 +14,6 @@ import numpy as np
 import re
 import time
 from datetime import datetime
-import warnings
-from matplotlib.pyplot import title
-
-warnings.filterwarnings('ignore')
 
 # Trực quan hóa dữ liệu
 import matplotlib.pyplot as plt
@@ -300,7 +296,18 @@ vietnamese_stopwords = [
     "là", "với", "cho", "từ", "theo", "như", "đã", "sẽ", "bị", "để",
     "khi", "đang", "lại", "thì", "nhưng", "nếu", "mà", "chỉ", "đó",
     "đây", "tất_cả", "những", "các", "một", "hai", "ba", "nhiều",
-    "về", "ở", "tại", "mới", "đến", "đi", "sau", "ra", "hơn"
+    "về", "ở", "tại", "mới", "đến", "đi", "sau", "ra", "hơn",
+    "cũng", "rất", "còn", "nữa", "bởi", "hay", "hoặc", "được",
+    "làm", "làm_việc", "việc", "người", "người_dân", "ngày", "năm",
+    "theo", "cho_biết", "cho_hay", "thông_tin", "tin_tức",
+    "bài_viết", "nội_dung", "vấn_đề", "khác", "cùng",
+    "thực_hiện", "tiến_hành", "diễn_ra", "tổ_chức",
+    "đơn_vị", "khu_vực", "địa_phương", "thành_phố",
+    "hôm_nay", "ngày_hôm_nay", "hiện_nay", "tuần", "tháng",
+    "sáng", "chiều", "tối", "đêm", "thứ_hai", "thứ_ba",
+    "hôm_qua", "ngày_mai", "trong_ngày", "năm_nay",
+    "triệu", "tỷ", "nghìn", "trăm", "phần_trăm", "lần",
+    "người", "cái", "chiếc", "tờ", "bài", "tin"
 ]
 tfidf_vectorizer = TfidfVectorizer(
     max_features=1000,
@@ -432,6 +439,24 @@ plt.savefig('topic_analysis_results.png', dpi=300, bbox_inches='tight')
 fig, axes = plt.subplots(2, 3, figsize=(18, 10))
 axes = axes.flatten()
 
+bacis_vietnamese_stop_words = {
+    "của", "và", "có", "trong", "được", "này", "ấy", "nên", "vào",
+    "là", "với", "cho", "từ", "theo", "như", "đã", "sẽ", "bị", "để",
+    "khi", "đang", "lại", "thì", "nhưng", "nếu", "mà", "chỉ", "đó",
+    "đây", "tất_cả", "những", "các", "một", "hai", "ba", "nhiều",
+    "về", "ở", "tại", "mới", "đến", "đi", "sau", "ra", "hơn",
+    "cũng", "rất", "còn", "nữa", "bởi", "hay", "hoặc", "được",
+    "làm", "làm_việc", "việc", "người", "người_dân", "ngày", "năm",
+    "theo", "cho_biết", "cho_hay", "thông_tin", "tin_tức",
+    "bài_viết", "nội_dung", "vấn_đề", "khác", "cùng",
+    "thực_hiện", "tiến_hành", "diễn_ra", "tổ_chức",
+    "đơn_vị", "khu_vực", "địa_phương", "thành_phố",
+    "hôm_nay", "ngày_hôm_nay", "hiện_nay", "tuần", "tháng",
+    "sáng", "chiều", "tối", "đêm", "thứ_hai", "thứ_ba",
+    "hôm_qua", "ngày_mai", "trong_ngày", "năm_nay",
+    "triệu", "tỷ", "nghìn", "trăm", "phần_trăm", "lần",
+    "người", "cái", "chiếc", "tờ", "bài", "tin"
+}
 for topic_idx in range( 5):
     topic_docs = df_clean[df_clean['dominant_topic'] == topic_idx]['tokens']
     topic_text = ' '.join(topic_docs)
@@ -442,7 +467,10 @@ for topic_idx in range( 5):
         height=360,
         background_color='white',
         colormap='viridis',
-        max_words=50
+        max_words=30,
+        stopwords=bacis_vietnamese_stop_words,
+        min_word_length=2,
+        collocations=False,
     ).generate(topic_text)
 
     axes[topic_idx].imshow(wordcloud, interpolation='bilinear')
