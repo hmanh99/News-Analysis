@@ -153,53 +153,6 @@ class NewsCollector:
         print(f"  Đã thu thập {cnt} bài viết từ Tuổi Trẻ")
         return cnt
 
-    def collect_cnn(self, max_articles):
-        print("\n2. Thu thập tin từ CNN\n")
-        categories = [
-            'https://edition.cnn.com/world',
-            'https://edition.cnn.com/politics',
-            'https://edition.cnn.com/business',
-            'https://edition.cnn.com/health',
-            'https://edition.cnn.com/entertainment',
-            'https://edition.cnn.com/style',
-            'https://edition.cnn.com/travel',
-            'https://edition.cnn.com/science'
-        ]
-
-        cnt = 0
-        for categories_url in categories:
-            if cnt >= max_articles:
-                break
-            try:
-                response = requests.get(categories_url, headers=self.headers, timeout=10)
-                soup = BeautifulSoup(response.content, 'html.parser')
-                headlines = soup.find_all(['h2', 'h3'], limit=50)
-
-                for headline in headlines:
-                    if cnt >= max_articles:
-                        break
-
-                    try:
-                        text = headline.get_text(strip=True)
-                        if len(text) > 20:
-                            self.articles.append({
-                                'source': 'CNN',
-                                'title': text,
-                                'content': text,
-                                'language': 'en',
-                                'collected_at': datetime.now()
-                            })
-                            cnt += 1
-                    except Exception as e:
-                        continue
-
-                time.sleep(2)
-
-            except Exception as e:
-                print(f"Lỗi thu thập từ {categories}: {e}")
-
-        print(f"  Đã thu thập {cnt} bài viết từ CNN")
-        return cnt
 
     def collect_vietnamnet(self, max_articles=300):
         print("\n4. Thu thập tin từ VietnamNet")
@@ -257,7 +210,6 @@ class NewsCollector:
 print("PHẦN 1: THU THẬP DỮ LIỆUu")
 collector = NewsCollector()
 collector.collect_vnexpress(max_articles=300)
-collector.collect_cnn(max_articles=300)
 collector.collect_tuoitre(max_articles=300)
 collector.collect_vietnamnet(max_articles=300)
 
@@ -344,7 +296,7 @@ plt.savefig('eda_word_distribution.png', dpi=300, bbox_inches='tight')
 #4. TF-IDF VECTORIZATION
 print("\nPHẦN 4: TF-IDF VECTORIZATION")
 #4.1 Tạo TF-IDF vectors
-vietnamese_stopwords = ['của', 'và', 'có', 'trong', 'được', 'này']
+vietnamese_stopwords = ['của', 'và', 'có', 'trong', 'được', 'này', 'của', 'ấy', 'nên', 'vào', ]
 tfidf_vectorizer = TfidfVectorizer(
     max_features=1000,
     min_df=2,
