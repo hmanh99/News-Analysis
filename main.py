@@ -90,7 +90,7 @@ class NewsCollector:
                     except Exception as e:
                         continue
 
-                time.sleep(2)
+                time.sleep(1)
 
             except Exception as e:
                 print(f"Lỗi khi thu thập từ {category_url}: {e}")
@@ -145,14 +145,13 @@ class NewsCollector:
                         })
                         cnt += 1
 
-                time.sleep(2)
+                time.sleep(1)
 
             except Exception as e:
                 print(f"Lỗi thu thập từ {url}: {e}")
 
         print(f"  Đã thu thập {cnt} bài viết từ Tuổi Trẻ")
         return cnt
-
 
     def collect_vietnamnet(self, max_articles=300):
         print("\n4. Thu thập tin từ VietnamNet")
@@ -194,7 +193,7 @@ class NewsCollector:
                     except Exception as e:
                         continue
 
-                time.sleep(2)
+                time.sleep(1)
 
             except Exception as e:
                 print(f"Lỗi thu thập từ {categories}: {e}")
@@ -296,13 +295,25 @@ plt.savefig('eda_word_distribution.png', dpi=300, bbox_inches='tight')
 #4. TF-IDF VECTORIZATION
 print("\nPHẦN 4: TF-IDF VECTORIZATION")
 #4.1 Tạo TF-IDF vectors
-vietnamese_stopwords = ['của', 'và', 'có', 'trong', 'được', 'này', 'của', 'ấy', 'nên', 'vào', ]
+vietnamese_stopwords = [
+    "của", "và", "có", "trong", "được", "này", "ấy", "nên", "vào",
+    "là", "với", "cho", "từ", "theo", "như", "đã", "sẽ", "bị", "để",
+    "khi", "đang", "lại", "thì", "nhưng", "nếu", "mà", "chỉ", "đó",
+    "đây", "tất_cả", "những", "các", "một", "hai", "ba", "nhiều",
+    "về", "ở", "tại"
+]
 tfidf_vectorizer = TfidfVectorizer(
     max_features=1000,
-    min_df=2,
+    min_df=5,
     max_df=0.8,
     ngram_range=(1, 2),
-    stop_words=vietnamese_stopwords
+    stop_words=vietnamese_stopwords,
+    sublinear_tf = True,
+    use_idf= True,
+    smooth_idf= True,
+    strip_accents=None,
+    lowercase=True,
+    token_pattern=r'\b\w+\b'
 )
 
 tfidf_matrix = tfidf_vectorizer.fit_transform(df_clean['tokens'])
@@ -327,7 +338,7 @@ count_vectorizer = CountVectorizer(
     min_df=2,
     max_df=0.8,
     ngram_range=(1, 2),
-    stop_words='english'
+    stop_words=vietnamese_stopwords
 )
 
 count_matrix = count_vectorizer.fit_transform(df_clean['tokens'])
@@ -451,7 +462,6 @@ plt.savefig('topic_wordclouds.png', dpi=360, bbox_inches='tight')
 
 
 #8. LƯU KẾT QUẢ CUỐI CÙNG
-print("LƯU KẾT QUẢ")
 
 df_final = df_clean[['source', 'title', 'content', 'dominant_topic', 'topic_probability', 'kmeans_cluster', 'word_count']]
 df_final.to_csv('news_with_topics.csv', index=False, encoding='utf-8-sig')
