@@ -483,7 +483,6 @@ plt.tight_layout()
 plt.savefig('topic_wordclouds.png', dpi=360, bbox_inches='tight')
 
 
-
 #8. LƯU KẾT QUẢ CUỐI CÙNG
 
 df_final = df_clean[['source', 'title', 'content', 'dominant_topic', 'topic_probability', 'kmeans_cluster', 'word_count']]
